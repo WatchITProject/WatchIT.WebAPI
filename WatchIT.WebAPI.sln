@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34202.233
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI", "WatchIT.WebAPI\WatchIT.WebAPI.csproj", "{58575759-8C65-4B02-8A10-0D9F10953AF4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WatchIT.WebAPI.Services", "WatchIT.WebAPI.Services", "{2A7E34D2-4B3E-4662-8150-4364BD2151EB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Model", "WatchIT.WebAPI.Model\WatchIT.WebAPI.Model.csproj", "{58298829-0B77-40F7-BC7F-D72E66768902}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.MoviesService", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.MoviesService\WatchIT.WebAPI.Services.MoviesService.csproj", "{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{399FB701-F18C-410A-814E-D8C1E38DFCD4}"
+	ProjectSection(SolutionItems) = preProject
+		dbcontext-update.ps1 = dbcontext-update.ps1
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.AccountsService", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.AccountsService\WatchIT.WebAPI.Services.AccountsService.csproj", "{5110EAB4-9ADF-4819-8FE6-85685415397A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WatchIT.WebAPI.Helpers", "WatchIT.WebAPI.Helpers\WatchIT.WebAPI.Helpers.csproj", "{27B82A25-2857-4E4A-B0D9-09CE62C049A1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{58575759-8C65-4B02-8A10-0D9F10953AF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58575759-8C65-4B02-8A10-0D9F10953AF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58575759-8C65-4B02-8A10-0D9F10953AF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58575759-8C65-4B02-8A10-0D9F10953AF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58298829-0B77-40F7-BC7F-D72E66768902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58298829-0B77-40F7-BC7F-D72E66768902}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58298829-0B77-40F7-BC7F-D72E66768902}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58298829-0B77-40F7-BC7F-D72E66768902}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5110EAB4-9ADF-4819-8FE6-85685415397A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5110EAB4-9ADF-4819-8FE6-85685415397A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5110EAB4-9ADF-4819-8FE6-85685415397A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5110EAB4-9ADF-4819-8FE6-85685415397A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27B82A25-2857-4E4A-B0D9-09CE62C049A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27B82A25-2857-4E4A-B0D9-09CE62C049A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27B82A25-2857-4E4A-B0D9-09CE62C049A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27B82A25-2857-4E4A-B0D9-09CE62C049A1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{16AF71C3-E012-406D-BC7F-CA9807B9BA2B} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
+		{5110EAB4-9ADF-4819-8FE6-85685415397A} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4388A19D-2561-4DD0-AB26-793C5988BC3A}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,5 @@
+﻿{
+  "ConnectionStrings": {
+    "database": "Server=192.168.55.5;Database=WatchIT;User Id=admin_WatchITwebapi;Password=mYpvfzApKL9e;TrustServerCertificate=true"
+  }
+}

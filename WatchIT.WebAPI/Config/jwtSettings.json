@@ -1,0 +1,8 @@
+{
+  "JwtSettings": {
+    "Key": "{Nt{MDj%Ue[[pxM1{(Qy2NrPa[1U#jWAES2r9/3x8u%Vt?CJJD",
+    "Issuer": "WatchIT",
+    "Audience": "WatchIT",
+    "Lifetime": "8"
+  }
+}
