@@ -1,8 +1,6 @@
 name: Pull request build and test
 
 on:
-  push:
-    branches: [ "dev" ]
   pull_request:
     branches: [ "dev" ]
 
