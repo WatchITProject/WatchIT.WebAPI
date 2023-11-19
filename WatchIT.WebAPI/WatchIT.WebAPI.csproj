@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>ad8dbe11-c92c-4e7c-8267-0233eeb016a4</UserSecretsId>
@@ -19,10 +19,11 @@
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.2.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="WatchIT.Common" Version="0.1.0-alpha.25" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WatchIT.WebAPI.Model\WatchIT.WebAPI.Model.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Model\WatchIT.WebAPI.Database.csproj" />
     <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.AccountsService\WatchIT.WebAPI.Services.AccountsService.csproj" />
     <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.MoviesService\WatchIT.WebAPI.Services.MoviesService.csproj" />
   </ItemGroup>
