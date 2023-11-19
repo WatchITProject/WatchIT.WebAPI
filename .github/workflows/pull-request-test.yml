@@ -13,6 +13,8 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
+    - name: Add NuGet source
+      run: dotnet nuget add source https://nuget.pkg.github.com/WatchITProject/index.json --username ${{secrets.NUGET_SOURCE_USERNAME}} --password ${{NUGET_SOURCE_TOKEN}}
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
