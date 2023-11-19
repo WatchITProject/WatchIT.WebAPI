@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity.Core.Metadata.Edm;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Mail;
@@ -14,10 +15,14 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using WatchIT.Common;
+using WatchIT.Common.Accounts.Request;
+using WatchIT.Common.Accounts.Response;
+using WatchIT.WebAPI.Database;
 using WatchIT.WebAPI.Helpers;
-using WatchIT.WebAPI.Model.Models;
-using WatchIT.WebAPI.Services.AccountsService.Request;
-using WatchIT.WebAPI.Services.AccountsService.Response;
+using WatchIT.WebAPI.Services.AccountsService.Configurations;
+using WatchIT.WebAPI.Services.AccountsService.Helpers;
+using WatchIT.WebAPI.Services.Common;
 
 namespace WatchIT.WebAPI.Services.AccountsService
 {
@@ -26,7 +31,7 @@ namespace WatchIT.WebAPI.Services.AccountsService
         #region FIELDS
 
         private DatabaseContext _database;
-        private IConfiguration _configuration;
+        private IJWTHelper _jwtHelper;
 
         #endregion
 
@@ -34,10 +39,10 @@ namespace WatchIT.WebAPI.Services.AccountsService
 
         #region CONSTRUCTORS
 
-        public AccountsService(IDbContextFactory<DatabaseContext> database, IConfiguration configuration) 
+        public AccountsService(IDbContextFactory<DatabaseContext> database, IJWTHelper jwtHelper) 
         {
             _database = database.CreateDbContext();
-            _configuration = configuration;
+            _jwtHelper = jwtHelper;
         }
 
         #endregion
@@ -46,43 +51,71 @@ namespace WatchIT.WebAPI.Services.AccountsService
 
         #region PUBLIC METHODS
 
-        public void Register(RegisterRequest request)
+        public async Task<ApiResponse> Register(RegisterRequest request)
         {
-            if (request is null)
+            Check<RegisterRequest>[] checks = new Check<RegisterRequest>[]
             {
-                throw new ArgumentNullException(nameof(request));
+                new Check<RegisterRequest>
+                {
+                    CheckAction = new Predicate<RegisterRequest>((req) => req is null),
+                    Message = "Body cannot be empty"
+                },
+                new Check<RegisterRequest>
+                {
+                    CheckAction = new Predicate<RegisterRequest>((req) => string.IsNullOrWhiteSpace(req.Email)),
+                    Message = "Email cannot be empty"
+                },
+                new Check<RegisterRequest>
+                {
+                    CheckAction = new Predicate<RegisterRequest>((req) => _database.Accounts.Any(x => string.Equals(x.Email, req.Email))),
+                    Message = "Provided email is used"
+                },
+                new Check<RegisterRequest>
+                {
+                    CheckAction = new Predicate<RegisterRequest>((req) =>
+                    {
+                        try
+                        {
+                            MailAddress m = new MailAddress(request.Email);
+                        }
+                        catch (FormatException ex)
+                        {
+                            return true;
+                        }
+                        return false;
+                    }),
+                    Message = "Invalid email"
+                },
+                new Check<RegisterRequest>
+                {
+                    CheckAction = new Predicate<RegisterRequest>((req) => string.IsNullOrWhiteSpace(req.Username)),
+                    Message = "Username cannot be empty"
+                },
+                new Check<RegisterRequest>
+                {
+                    CheckAction = new Predicate<RegisterRequest>((req) => _database.Accounts.Any(x => string.Equals(x.Username, req.Username))),
+                    Message = "Username is used"
+                },
+                new Check<RegisterRequest>
+                {
+                    CheckAction = new Predicate<RegisterRequest>((req) => string.IsNullOrWhiteSpace(req.Password)),
+                    Message = "Password cannot be empty"
+                },
+            };
+
+            foreach (Check<RegisterRequest> check in checks)
+            {
+                if (check.CheckAction.Invoke(request))
+                {
+                    return new ApiResponse<AuthenticateResponse>
+                    {
+                        Message = check.Message,
+                        Success = false
+                    };
+                }
             }
 
-            if (string.IsNullOrWhiteSpace(request.Email))
-            {
-                throw new Exception("Email cannot be empty");
-            }
-
-            if (_database.Accounts.Any(x => string.Equals(x.AccEmail, request.Email)))
-            {
-                throw new Exception("Provided email is used");
-            }
-
-            try
-            {
-                MailAddress m = new MailAddress(request.Email);
-            }
-            catch (FormatException ex)
-            {
-                throw new Exception("Invalid email");
-            }
-
-            if (string.IsNullOrWhiteSpace(request.Username))
-            {
-                throw new Exception("Username cannot be empty");
-            }
-
-            if (_database.Accounts.Any(x => string.Equals(x.AccName, request.Username)))
-            {
-                throw new Exception("Provided username is used");
-            }
-
-            IEnumerable<string> usernameChecks = CheckUsername(request.Password);
+            IEnumerable<string> usernameChecks = CheckUsername(request.Username);
             if (usernameChecks.Any())
             {
                 StringBuilder sb = new StringBuilder();
@@ -91,24 +124,27 @@ namespace WatchIT.WebAPI.Services.AccountsService
                 {
                     sb.AppendLine(check);
                 }
-                throw new Exception(sb.ToString());
-            }
-
-            if (string.IsNullOrWhiteSpace(request.Password))
-            {
-                throw new Exception("Password cannot be empty");
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = sb.ToString()
+                };
             }
 
             IEnumerable<string> passwordChecks = CheckPassword(request.Password);
             if (passwordChecks.Any())
-            { 
+            {
                 StringBuilder sb = new StringBuilder();
                 sb.AppendLine("Provided password does not meet the security requirements:");
                 foreach (string check in passwordChecks)
                 {
                     sb.AppendLine(check);
                 }
-                throw new Exception(sb.ToString());
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = sb.ToString()
+                };
             }
 
             string salt = StringHelpers.CreateRandom(20);
@@ -116,56 +152,200 @@ namespace WatchIT.WebAPI.Services.AccountsService
 
             Account account = new Account()
             {
-                AccName = request.Username,
-                AccEmail = request.Email,
-                AccPassword = hash,
-                AccSalt = salt
+                Username = request.Username,
+                Email = request.Email,
+                Password = hash,
+                Salt = salt
             };
             _database.Accounts.Add(account);
-            _database.SaveChanges();
+            await _database.SaveChangesAsync();
+
+            return new ApiResponse
+            {
+                Success = true
+            };
         }
 
-        public AuthenticateResponse Authenticate(string emailOrUsername, string password)
+        public async Task<ApiResponse<AuthenticateResponse>> Authenticate(AuthenticateRequest request)
         {
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.UTF8.GetBytes(_configuration.GetRequiredSection("JwtSettings:Key").Value!);
-
-            Account? account = _database.Accounts.Where(x => x.AccEmail.Equals(emailOrUsername) || x.AccName.Equals(emailOrUsername)).FirstOrDefault();
-            if (account is null)
+            Check<AuthenticateRequest>[] checks = new Check<AuthenticateRequest>[]
             {
-                throw new Exception("User with provided email or username not exists");
-            }
-
-            byte[] hashToCheck = HashPassword(password, account.AccSalt);
-            if (!Enumerable.SequenceEqual(hashToCheck, account.AccPassword))
-            {
-                throw new Exception("Wrong password");
-            }
-
-
-            List<Claim> claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub, account.AccId.ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, account.AccEmail),
-                new Claim(JwtRegisteredClaimNames.UniqueName, account.AccName),
-                new Claim("admin", account.AccAdmin.ToString().ToLower()),
+                new Check<AuthenticateRequest>
+                {
+                    CheckAction = new Predicate<AuthenticateRequest>((req) => string.IsNullOrWhiteSpace(req.UsernameOrEmail)),
+                    Message = "Username or email must be provided"
+                },
+                new Check<AuthenticateRequest>
+                {
+                    CheckAction = new Predicate<AuthenticateRequest>((req) => string.IsNullOrWhiteSpace(req.Password)),
+                    Message = "Password must be provided"
+                },
+                new Check<AuthenticateRequest>
+                {
+                    CheckAction = new Predicate<AuthenticateRequest>((req) => !_database.Accounts.Any(x => x.Email.Equals(req.UsernameOrEmail) || x.Username.Equals(req.UsernameOrEmail))),
+                    Message = "User with provided email or username not exists"
+                },
+                new Check<AuthenticateRequest>
+                {
+                    CheckAction = new Predicate<AuthenticateRequest>((req) =>
+                    {
+                        Account account = _database.Accounts.FirstOrDefault(x => x.Email.Equals(req.UsernameOrEmail) || x.Username.Equals(req.UsernameOrEmail))!;
+                        byte[] hashToCheck = HashPassword(req.Password, account.Salt);
+                        return !Enumerable.SequenceEqual(hashToCheck, account.Password);
+                    }),
+                    Message = "Incorrect password"
+                },
             };
 
-            SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
+            foreach (Check<AuthenticateRequest> check in checks)
             {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddHours(int.Parse(_configuration.GetRequiredSection("JwtSettings:Lifetime").Value!)),
-                Issuer = _configuration.GetRequiredSection("JwtSettings:Issuer").Value!,
-                Audience = _configuration.GetRequiredSection("JwtSettings:Audience").Value!,
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512)
+                if (check.CheckAction.Invoke(request))
+                {
+                    return new ApiResponse<AuthenticateResponse>
+                    {
+                        Message = check.Message,
+                        Success = false
+                    };
+                }
+            }
+
+            Account account = _database.Accounts.FirstOrDefault(x => x.Email.Equals(request.UsernameOrEmail) || x.Username.Equals(request.UsernameOrEmail))!;
+
+            Task<string> refreshTokenTask = _jwtHelper.GenerateRefreshToken(account, request.RememberMe);
+            Task<string> accessTokenTask = _jwtHelper.GenerateAccessToken(account);
+            await Task.WhenAll(refreshTokenTask, accessTokenTask);
+
+            return new ApiResponse<AuthenticateResponse>
+            {
+                Success = true,
+                Data = new AuthenticateResponse
+                {
+                    RefreshToken = refreshTokenTask.Result,
+                    AccessToken = accessTokenTask.Result,
+                }
+            };
+        }
+
+        public async Task<ApiResponse<AuthenticateResponse>> AuthenticateRefresh(IEnumerable<Claim> claims)
+        {
+            foreach (Claim claim in claims)
+            {
+                Debug.WriteLine($"{claim.Type}, {claim.Value}");
+            }
+            Check<IEnumerable<Claim>>[] checks = new Check<IEnumerable<Claim>>[]
+            {
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => arg is null),
+                    Message = "Token is invalid: claims collection is null"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => !arg.Any()),
+                    Message = "Token is invalid: claims collection is empty"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => !arg.Select(x => x.Type).Contains(JwtRegisteredClaimNames.Jti)),
+                    Message = "Token is invalid: claims collection does not contain \"jti\" claim"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => !arg.Select(x => x.Type).Contains(JwtRegisteredClaimNames.Sub)),
+                    Message = "Token is invalid: claims collection does not contain \"sub\" claim"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => !arg.Select(x => x.Type).Contains(JwtRegisteredClaimNames.Email)),
+                    Message = "Token is invalid: claims collection does not contain \"email\" claim"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => !arg.Select(x => x.Type).Contains(JwtRegisteredClaimNames.UniqueName)),
+                    Message = "Token is invalid: claims collection does not contain \"unique_name\" claim"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => !arg.Select(x => x.Type).Contains(JwtRegisteredClaimNames.Exp)),
+                    Message = "Token is invalid: claims collection does not contain \"exp\" claim"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => !arg.Select(x => x.Type).Contains("extend")),
+                    Message = "Token is invalid: claims collection does not contain \"extend\" claim"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) => !Convert.ToBoolean(arg.FirstOrDefault(x => x.Type == "extend").Value)),
+                    Message = "Token is not extendable"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) =>
+                    {
+                        int userId = int.Parse(arg.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
+                        Account? account = _database.Accounts.FirstOrDefault(x => x.Id == userId);
+                        return account is null;
+                    }),
+                    Message = "User assigned to this token does not exist"
+                },
+                new Check<IEnumerable<Claim>>
+                {
+                    CheckAction = new Predicate<IEnumerable<Claim>>((arg) =>
+                    {
+                        Guid tokenId = Guid.Parse(claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.Value);
+                        int userId = int.Parse(arg.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
+                        Account? account = _database.Accounts.FirstOrDefault(x => x.Id == userId);
+                        return !_database.AccountRefreshTokens.Where(x =>x.AccountId == userId).Any(x => x.Id.CompareTo(tokenId) == 0);
+                    }),
+                    Message = "Refresh token is invalid for this user"
+                },
             };
 
-            SecurityToken token = handler.CreateToken(tokenDescriptor);
+            foreach (Check<IEnumerable<Claim>> check in checks)
+            {
+                if (check.CheckAction.Invoke(claims))
+                {
+                    return new ApiResponse<AuthenticateResponse>
+                    {
+                        Message = check.Message,
+                        Success = false
+                    };
+                }
+            }
 
-            string jwt = handler.WriteToken(token);
+            Guid tokenId = Guid.Parse(claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.Value);
+            int userId = int.Parse(claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
 
-            return new AuthenticateResponse() { Token = jwt };
+            Account account = _database.Accounts.FirstOrDefault(x => x.Id == userId);
+            AccountRefreshToken token = _database.AccountRefreshTokens.FirstOrDefault(x => x.Id == tokenId);
+            _database.AccountRefreshTokens.Attach(token);
+            _database.AccountRefreshTokens.Remove(token);
+            await _database.SaveChangesAsync();
+
+            Task<string> refreshTokenTask = _jwtHelper.GenerateRefreshToken(account, true);
+            Task<string> accessTokenTask = _jwtHelper.GenerateAccessToken(account);
+            await Task.WhenAll(refreshTokenTask, accessTokenTask);
+
+            return new ApiResponse<AuthenticateResponse>
+            {
+                Success = true,
+                Data = new AuthenticateResponse
+                {
+                    RefreshToken = refreshTokenTask.Result,
+                    AccessToken = accessTokenTask.Result,
+                }
+            };
+        }
+
+        public async Task<ApiResponse> Logout(IEnumerable<Claim> claims)
+        {
+            return new ApiResponse();
+        }
+
+        public async Task<ApiResponse> LogoutFromAllDevices(IEnumerable<Claim> claims)
+        {
+            return new ApiResponse();
         }
 
         #endregion

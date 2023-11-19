@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 
-namespace WatchIT.WebAPI.Services.AccountsService.Attributes
+namespace WatchIT.WebAPI.Attributes
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
     public class RequiresClaimAttribute : Attribute, IAuthorizationFilter

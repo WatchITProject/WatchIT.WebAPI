@@ -1,5 +1,5 @@
 ﻿{
   "ConnectionStrings": {
-    "database": ""
+    "database": "Server=192.168.55.65;Initial Catalog=watchit-dev;User Id=admin_watchit;Password=_rH6{@V!K^MpF-FI#^Rm;Encrypt=True;TrustServerCertificate=True;"
   }
 }
