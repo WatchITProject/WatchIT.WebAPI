@@ -40,7 +40,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the Docker image
-        run: docker build -t ghcr.io/watchit/watchit-api:latest $GITHUB_WORKSPACE/WatchIT.WebAPI
+        run: docker build -t ghcr.io/watchit/watchit-api:latest .
         env:
           WATCHIT_API_NUGET_USERNAME: ${{secrets.NUGET_SOURCE_USERNAME}}
           WATCHIT_API_NUGET_PASSWORD: ${{secrets.NUGET_SOURCE_TOKEN}}
