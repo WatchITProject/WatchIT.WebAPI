@@ -1,6 +1,6 @@
 {
   "JWT": {
-    "Key": "'j#(PS,%@^Q'W(_C=5g.'2=VHMzNU}2!soZJup#JPh%Bng1{xU",
+    "Key": "",
     "Issuer": "WatchIT",
     "AccessTokenLifetime": "5",
     "RefreshTokenNormalLifetime": "1440",
