@@ -5,7 +5,7 @@ using System.Security.Claims;
 using WatchIT.Common;
 using WatchIT.Common.Accounts.Request;
 using WatchIT.Common.Accounts.Response;
-using WatchIT.WebAPI.Services.AccountsService;
+using WatchIT.WebAPI.Services.Accounts;
 
 namespace WatchIT.WebAPI.Controllers
 {

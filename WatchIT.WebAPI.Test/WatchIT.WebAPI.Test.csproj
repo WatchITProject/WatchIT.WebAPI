@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WatchIT.WebAPI.Model\WatchIT.WebAPI.Database.csproj" />
-    <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.AccountsService\WatchIT.WebAPI.Services.AccountsService.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Database\WatchIT.WebAPI.Database.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.AccountsService\WatchIT.WebAPI.Services.Accounts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

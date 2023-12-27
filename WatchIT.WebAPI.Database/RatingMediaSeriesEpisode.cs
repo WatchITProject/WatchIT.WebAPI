@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace WatchIT.WebAPI.Database;
 
-public partial class RatingDirectorSeries
+public partial class RatingMediaSeriesEpisode
 {
     public long Id { get; set; }
 
-    public long DirectorSeriesId { get; set; }
+    public long MediaSeriesEpisodeId { get; set; }
 
     public int AccountId { get; set; }
 
@@ -15,5 +15,5 @@ public partial class RatingDirectorSeries
 
     public virtual Account Account { get; set; } = null!;
 
-    public virtual DirectorSeries DirectorSeries { get; set; } = null!;
+    public virtual MediaSeriesEpisode MediaSeriesEpisode { get; set; } = null!;
 }

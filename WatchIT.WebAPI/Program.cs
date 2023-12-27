@@ -7,10 +7,12 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using WatchIT.WebAPI.Database;
-using WatchIT.WebAPI.Services.AccountsService;
-using WatchIT.WebAPI.Services.AccountsService.Configurations;
-using WatchIT.WebAPI.Services.AccountsService.Helpers;
-using WatchIT.WebAPI.Services.MoviesService;
+using WatchIT.WebAPI.Services.Accounts;
+using WatchIT.WebAPI.Services.Accounts.Configurations;
+using WatchIT.WebAPI.Services.Accounts.Helpers;
+using WatchIT.WebAPI.Services.Genres;
+using WatchIT.WebAPI.Services.Movies;
+using WatchIT.WebAPI.Services.Website;
 
 namespace WatchIT.WebAPI
 {
@@ -75,6 +77,11 @@ namespace WatchIT.WebAPI
             });
             builder.Services.AddAuthorization();
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("Cors", builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
+            });
+
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -93,8 +100,10 @@ namespace WatchIT.WebAPI
             builder.Services.AddSingleton<IJWTHelper, JWTHelper>();
 
             // Services
+            builder.Services.AddSingleton<IWebsiteAuthBackgroundService, WebsiteAuthBackgroundService>();
             builder.Services.AddSingleton<IAccountsService, AccountsService>();
             builder.Services.AddSingleton<IMoviesService, MoviesService>();
+            builder.Services.AddSingleton<IGenresService, GenresService>();
 
             var app = builder.Build();
 
@@ -108,6 +117,8 @@ namespace WatchIT.WebAPI
             
 
             app.UseHttpsRedirection();
+
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
             app.UseAuthentication();
             app.UseAuthorization();

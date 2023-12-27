@@ -13,13 +13,13 @@
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.2.2" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.2.2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.12" />
-    <PackageReference Include="WatchIT.Common" Version="0.1.0-alpha.25" />
+    <PackageReference Include="WatchIT.Common" Version="0.1.0-alpha.32" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\WatchIT.WebAPI.Database\WatchIT.WebAPI.Database.csproj" />
     <ProjectReference Include="..\..\WatchIT.WebAPI.Helpers\WatchIT.WebAPI.Helpers.csproj" />
-    <ProjectReference Include="..\..\WatchIT.WebAPI.Model\WatchIT.WebAPI.Database.csproj" />
-    <ProjectReference Include="..\WatchIT.WebAPI.Services.Common\WatchIT.WebAPI.Services.Common.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Services.Common\WatchIT.WebAPI.Services.csproj" />
   </ItemGroup>
 
 </Project>

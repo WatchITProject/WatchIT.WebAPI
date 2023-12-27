@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WatchIT.WebAPI.Services.Common
+namespace WatchIT.WebAPI.Services
 {
     public class Check<T>
     {

@@ -8,9 +8,9 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WatchIT.WebAPI.Database;
-using WatchIT.WebAPI.Services.AccountsService.Configurations;
+using WatchIT.WebAPI.Services.Accounts.Configurations;
 
-namespace WatchIT.WebAPI.Services.AccountsService.Helpers
+namespace WatchIT.WebAPI.Services.Accounts.Helpers
 {
     public interface IJWTHelper
     {
@@ -55,7 +55,7 @@ namespace WatchIT.WebAPI.Services.AccountsService.Helpers
                 AccountId = account.Id,
                 ExpirationDate = expirationTime,
             };
-            _database.AccountRefreshTokens.Add(refreshToken);
+            _database.AccountRefreshToken.Add(refreshToken);
             Task saveTask = _database.SaveChangesAsync();
 
             SecurityTokenDescriptor tokenDescriptor = CreateBaseSecurityTokenDescriptor(account, id, expirationTime);
