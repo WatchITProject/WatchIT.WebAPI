@@ -6,9 +6,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>ad8dbe11-c92c-4e7c-8267-0233eeb016a4</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	<DockerfileFile>..\Dockerfile</DockerfileFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.WebApi.Cors" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.24" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.13">
       <PrivateAssets>all</PrivateAssets>
@@ -19,13 +21,15 @@
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.2.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.19.5" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    <PackageReference Include="WatchIT.Common" Version="0.1.0-alpha.25" />
+    <PackageReference Include="WatchIT.Common" Version="0.1.0-alpha.32" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WatchIT.WebAPI.Model\WatchIT.WebAPI.Database.csproj" />
-    <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.AccountsService\WatchIT.WebAPI.Services.AccountsService.csproj" />
-    <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.MoviesService\WatchIT.WebAPI.Services.MoviesService.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Database\WatchIT.WebAPI.Database.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.AccountsService\WatchIT.WebAPI.Services.Accounts.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.GenreService\WatchIT.WebAPI.Services.Genres.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.MoviesService\WatchIT.WebAPI.Services.Movies.csproj" />
+    <ProjectReference Include="..\WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.Website\WatchIT.WebAPI.Services.Website.csproj" />
   </ItemGroup>
 
 </Project>

@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using WatchIT.Common;
 using WatchIT.Common.Movies.Request;
-using WatchIT.WebAPI.Services.Common.Attributes;
-using WatchIT.WebAPI.Services.MoviesService;
+using WatchIT.WebAPI.Attributes;
+using WatchIT.WebAPI.Services.Movies;
 
 namespace WatchIT.WebAPI.Controllers
 {
@@ -57,7 +57,7 @@ namespace WatchIT.WebAPI.Controllers
         [RequiresClaim("admin", "True")]
         public async Task<ApiResponse> DeleteMovie([FromRoute]int id)
         {
-            return null;
+            return await _moviesService.DeleteMovie(id);
         }
 
         [HttpPost]
@@ -66,7 +66,7 @@ namespace WatchIT.WebAPI.Controllers
         [RequiresClaim("admin", "True")]
         public async Task<ApiResponse> AddGenre([FromRoute(Name = "movie_id")]int movieId, [FromQuery(Name = "genre_id")][BindRequired]int genreId)
         {
-            return null;
+            return await _moviesService.AddGenre(movieId, genreId);
         }
 
         [HttpDelete]
@@ -75,7 +75,7 @@ namespace WatchIT.WebAPI.Controllers
         [RequiresClaim("admin", "True")]
         public async Task<ApiResponse> DeleteGenre([FromRoute(Name = "movie_id")]int movieId, [FromQuery(Name = "genre_id")][BindRequired]int genreId)
         {
-            return null;
+            return await _moviesService.DeleteGenre(movieId, genreId);
         }
 
         #endregion

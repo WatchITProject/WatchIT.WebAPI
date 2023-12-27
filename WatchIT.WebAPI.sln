@@ -7,24 +7,27 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI", "WatchIT.W
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WatchIT.WebAPI.Services", "WatchIT.WebAPI.Services", "{2A7E34D2-4B3E-4662-8150-4364BD2151EB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Database", "WatchIT.WebAPI.Model\WatchIT.WebAPI.Database.csproj", "{58298829-0B77-40F7-BC7F-D72E66768902}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.MoviesService", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.MoviesService\WatchIT.WebAPI.Services.MoviesService.csproj", "{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.Movies", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.MoviesService\WatchIT.WebAPI.Services.Movies.csproj", "{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{399FB701-F18C-410A-814E-D8C1E38DFCD4}"
 	ProjectSection(SolutionItems) = preProject
 		dbcontext-update.ps1 = dbcontext-update.ps1
+		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.AccountsService", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.AccountsService\WatchIT.WebAPI.Services.AccountsService.csproj", "{5110EAB4-9ADF-4819-8FE6-85685415397A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.Accounts", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.AccountsService\WatchIT.WebAPI.Services.Accounts.csproj", "{5110EAB4-9ADF-4819-8FE6-85685415397A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Helpers", "WatchIT.WebAPI.Helpers\WatchIT.WebAPI.Helpers.csproj", "{27B82A25-2857-4E4A-B0D9-09CE62C049A1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.Common", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.Common\WatchIT.WebAPI.Services.Common.csproj", "{5CF25D20-B0BD-4A4E-AFE7-22A9DCD3E3D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.Common\WatchIT.WebAPI.Services.csproj", "{5CF25D20-B0BD-4A4E-AFE7-22A9DCD3E3D3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Test", "WatchIT.WebAPI.Test\WatchIT.WebAPI.Test.csproj", "{2D6FC627-F964-40D0-B0CD-4EAEA29AF6E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WatchIT.WebAPI.Services.GenreService", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.GenreService\WatchIT.WebAPI.Services.GenreService.csproj", "{D09AD624-835A-4DBA-809E-523427E16E7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.Genres", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.GenreService\WatchIT.WebAPI.Services.Genres.csproj", "{D09AD624-835A-4DBA-809E-523427E16E7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Database", "WatchIT.WebAPI.Database\WatchIT.WebAPI.Database.csproj", "{BA5A2E3B-7CFB-4455-B619-C65559B612E0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.Website", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.Website\WatchIT.WebAPI.Services.Website.csproj", "{418A3268-4C99-4F44-8AEF-BC73961E2CF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +39,6 @@ Global
 		{58575759-8C65-4B02-8A10-0D9F10953AF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58575759-8C65-4B02-8A10-0D9F10953AF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58575759-8C65-4B02-8A10-0D9F10953AF4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{58298829-0B77-40F7-BC7F-D72E66768902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58298829-0B77-40F7-BC7F-D72E66768902}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58298829-0B77-40F7-BC7F-D72E66768902}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58298829-0B77-40F7-BC7F-D72E66768902}.Release|Any CPU.Build.0 = Release|Any CPU
 		{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16AF71C3-E012-406D-BC7F-CA9807B9BA2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -64,6 +63,14 @@ Global
 		{D09AD624-835A-4DBA-809E-523427E16E7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D09AD624-835A-4DBA-809E-523427E16E7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D09AD624-835A-4DBA-809E-523427E16E7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA5A2E3B-7CFB-4455-B619-C65559B612E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA5A2E3B-7CFB-4455-B619-C65559B612E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA5A2E3B-7CFB-4455-B619-C65559B612E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA5A2E3B-7CFB-4455-B619-C65559B612E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{418A3268-4C99-4F44-8AEF-BC73961E2CF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{418A3268-4C99-4F44-8AEF-BC73961E2CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{418A3268-4C99-4F44-8AEF-BC73961E2CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{418A3268-4C99-4F44-8AEF-BC73961E2CF1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +80,7 @@ Global
 		{5110EAB4-9ADF-4819-8FE6-85685415397A} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
 		{5CF25D20-B0BD-4A4E-AFE7-22A9DCD3E3D3} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
 		{D09AD624-835A-4DBA-809E-523427E16E7E} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
+		{418A3268-4C99-4F44-8AEF-BC73961E2CF1} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4388A19D-2561-4DD0-AB26-793C5988BC3A}

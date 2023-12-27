@@ -20,12 +20,21 @@ using WatchIT.Common.Accounts.Request;
 using WatchIT.Common.Accounts.Response;
 using WatchIT.WebAPI.Database;
 using WatchIT.WebAPI.Helpers;
-using WatchIT.WebAPI.Services.AccountsService.Configurations;
-using WatchIT.WebAPI.Services.AccountsService.Helpers;
-using WatchIT.WebAPI.Services.Common;
+using WatchIT.WebAPI.Services.Accounts.Configurations;
+using WatchIT.WebAPI.Services.Accounts.Helpers;
+using WatchIT.WebAPI.Services;
 
-namespace WatchIT.WebAPI.Services.AccountsService
+namespace WatchIT.WebAPI.Services.Accounts
 {
+    public interface IAccountsService
+    {
+        Task<ApiResponse> Register(RegisterRequest request);
+        Task<ApiResponse<AuthenticateResponse>> Authenticate(AuthenticateRequest request);
+        Task<ApiResponse<AuthenticateResponse>> AuthenticateRefresh(IEnumerable<Claim> claims);
+        Task<ApiResponse> Logout(IEnumerable<Claim> claims);
+        Task<ApiResponse> LogoutFromAllDevices(IEnumerable<Claim> claims);
+    }
+
     public class AccountsService : IAccountsService
     {
         #region FIELDS
@@ -67,7 +76,7 @@ namespace WatchIT.WebAPI.Services.AccountsService
                 },
                 new Check<RegisterRequest>
                 {
-                    CheckAction = new Predicate<RegisterRequest>((req) => _database.Accounts.Any(x => string.Equals(x.Email, req.Email))),
+                    CheckAction = new Predicate<RegisterRequest>((req) => _database.Account.Any(x => string.Equals(x.Email, req.Email))),
                     Message = "Provided email is used"
                 },
                 new Check<RegisterRequest>
@@ -93,7 +102,7 @@ namespace WatchIT.WebAPI.Services.AccountsService
                 },
                 new Check<RegisterRequest>
                 {
-                    CheckAction = new Predicate<RegisterRequest>((req) => _database.Accounts.Any(x => string.Equals(x.Username, req.Username))),
+                    CheckAction = new Predicate<RegisterRequest>((req) => _database.Account.Any(x => string.Equals(x.Username, req.Username))),
                     Message = "Username is used"
                 },
                 new Check<RegisterRequest>
@@ -157,7 +166,7 @@ namespace WatchIT.WebAPI.Services.AccountsService
                 Password = hash,
                 Salt = salt
             };
-            _database.Accounts.Add(account);
+            _database.Account.Add(account);
             await _database.SaveChangesAsync();
 
             return new ApiResponse
@@ -168,8 +177,8 @@ namespace WatchIT.WebAPI.Services.AccountsService
 
         public async Task<ApiResponse<AuthenticateResponse>> Authenticate(AuthenticateRequest request)
         {
-            Check<AuthenticateRequest>[] checks = new Check<AuthenticateRequest>[]
-            {
+            Check<AuthenticateRequest>[] checks =
+            [
                 new Check<AuthenticateRequest>
                 {
                     CheckAction = new Predicate<AuthenticateRequest>((req) => string.IsNullOrWhiteSpace(req.UsernameOrEmail)),
@@ -182,20 +191,20 @@ namespace WatchIT.WebAPI.Services.AccountsService
                 },
                 new Check<AuthenticateRequest>
                 {
-                    CheckAction = new Predicate<AuthenticateRequest>((req) => !_database.Accounts.Any(x => x.Email.Equals(req.UsernameOrEmail) || x.Username.Equals(req.UsernameOrEmail))),
+                    CheckAction = new Predicate<AuthenticateRequest>((req) => !_database.Account.Any(x => x.Email.Equals(req.UsernameOrEmail) || x.Username.Equals(req.UsernameOrEmail))),
                     Message = "User with provided email or username not exists"
                 },
                 new Check<AuthenticateRequest>
                 {
                     CheckAction = new Predicate<AuthenticateRequest>((req) =>
                     {
-                        Account account = _database.Accounts.FirstOrDefault(x => x.Email.Equals(req.UsernameOrEmail) || x.Username.Equals(req.UsernameOrEmail))!;
+                        Account account = _database.Account.FirstOrDefault(x => x.Email.Equals(req.UsernameOrEmail) || x.Username.Equals(req.UsernameOrEmail))!;
                         byte[] hashToCheck = HashPassword(req.Password, account.Salt);
                         return !Enumerable.SequenceEqual(hashToCheck, account.Password);
                     }),
                     Message = "Incorrect password"
                 },
-            };
+            ];
 
             foreach (Check<AuthenticateRequest> check in checks)
             {
@@ -209,7 +218,7 @@ namespace WatchIT.WebAPI.Services.AccountsService
                 }
             }
 
-            Account account = _database.Accounts.FirstOrDefault(x => x.Email.Equals(request.UsernameOrEmail) || x.Username.Equals(request.UsernameOrEmail))!;
+            Account account = _database.Account.FirstOrDefault(x => x.Email.Equals(request.UsernameOrEmail) || x.Username.Equals(request.UsernameOrEmail))!;
 
             Task<string> refreshTokenTask = _jwtHelper.GenerateRefreshToken(account, request.RememberMe);
             Task<string> accessTokenTask = _jwtHelper.GenerateAccessToken(account);
@@ -284,7 +293,7 @@ namespace WatchIT.WebAPI.Services.AccountsService
                     CheckAction = new Predicate<IEnumerable<Claim>>((arg) =>
                     {
                         int userId = int.Parse(arg.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
-                        Account? account = _database.Accounts.FirstOrDefault(x => x.Id == userId);
+                        Account? account = _database.Account.FirstOrDefault(x => x.Id == userId);
                         return account is null;
                     }),
                     Message = "User assigned to this token does not exist"
@@ -295,8 +304,8 @@ namespace WatchIT.WebAPI.Services.AccountsService
                     {
                         Guid tokenId = Guid.Parse(claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.Value);
                         int userId = int.Parse(arg.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
-                        Account? account = _database.Accounts.FirstOrDefault(x => x.Id == userId);
-                        return !_database.AccountRefreshTokens.Where(x =>x.AccountId == userId).Any(x => x.Id.CompareTo(tokenId) == 0);
+                        Account? account = _database.Account.FirstOrDefault(x => x.Id == userId);
+                        return !_database.AccountRefreshToken.Where(x =>x.AccountId == userId).Any(x => x.Id.CompareTo(tokenId) == 0);
                     }),
                     Message = "Refresh token is invalid for this user"
                 },
@@ -317,10 +326,10 @@ namespace WatchIT.WebAPI.Services.AccountsService
             Guid tokenId = Guid.Parse(claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Jti)!.Value);
             int userId = int.Parse(claims.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
 
-            Account account = _database.Accounts.FirstOrDefault(x => x.Id == userId);
-            AccountRefreshToken token = _database.AccountRefreshTokens.FirstOrDefault(x => x.Id == tokenId);
-            _database.AccountRefreshTokens.Attach(token);
-            _database.AccountRefreshTokens.Remove(token);
+            Account account = _database.Account.FirstOrDefault(x => x.Id == userId);
+            AccountRefreshToken token = _database.AccountRefreshToken.FirstOrDefault(x => x.Id == tokenId);
+            _database.AccountRefreshToken.Attach(token);
+            _database.AccountRefreshToken.Remove(token);
             await _database.SaveChangesAsync();
 
             Task<string> refreshTokenTask = _jwtHelper.GenerateRefreshToken(account, true);

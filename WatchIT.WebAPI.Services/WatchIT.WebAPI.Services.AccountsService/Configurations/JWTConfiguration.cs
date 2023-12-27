@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WatchIT.WebAPI.Services.AccountsService.Configurations
+namespace WatchIT.WebAPI.Services.Accounts.Configurations
 {
     public interface IJWTConfiguration
     {
