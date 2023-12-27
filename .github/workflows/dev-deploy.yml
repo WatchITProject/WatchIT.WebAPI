@@ -32,5 +32,16 @@ jobs:
         run: docker build -t ghcr.io/watchitproject/watchit-api:latest --build-arg WATCHIT_API_NUGET_USERNAME=${{secrets.NUGET_SOURCE_USERNAME}} --build-arg WATCHIT_API_NUGET_PASSWORD=${{secrets.NUGET_SOURCE_TOKEN}} .
       - name: Publish the Docker image
         run: docker push ghcr.io/watchitproject/watchit-api:latest
-    
+  deploy:
+    needs: build-and-publish
+    runs-on: watchit-dev
+    steps:
+      - name: Run docker container
+        uses: addnab/docker-run-action@v3
+        with:
+          username: ${{ secrets.NUGET_SOURCE_USERNAME }}
+          password: ${{ secrets.NUGET_SOURCE_TOKEN }}
+          registry: ghcr.io
+          image: ghcr.io/watchitproject/watchit-api:latest
+          options: -p 7174:443
       
