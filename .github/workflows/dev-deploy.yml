@@ -15,12 +15,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Go to API directory
-        run: |
-          pwd
-          ls
-          cd WatchIT.WebAPI
-          ls
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
@@ -40,7 +34,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the Docker image
-        run: docker build -t ghcr.io/watchit/watchit-api:latest .
+        run: docker build -t ghcr.io/watchit/watchit-api:latest $GITHUB_WORKSPACE/WatchIT.WebAPI
       - name: Publish the Docker image
         run: docker push ghcr.io/watchit/watchit-api:latest
     
