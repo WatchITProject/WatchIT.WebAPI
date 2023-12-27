@@ -37,11 +37,11 @@ jobs:
     runs-on: watchit-dev
     steps:
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ secrets.NUGET_SOURCE_USERNAME }}
-          password: ${{ secrets.NUGET_SOURCE_TOKEN }}
-      - name: Run docker container
+        run: docker login ghcr.io -u ${{secrets.NUGET_SOURCE_USERNAME}} -p ${{ secrets.NUGET_SOURCE_TOKEN }}
+      - name: Stop Docker container
+        run: docker container stop api
+      - name: Remove Docker container
+        run: docker container rm api
+      - name: Run Docker container
         run: docker run --name api -p 10443:443 -p 1080:80 ghcr.io/watchitproject/watchit-api:latest
       
