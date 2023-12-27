@@ -1,0 +1,41 @@
+name: Deploy DEV API
+
+on:
+  push:
+    branches:
+      - "dev"
+    paths:
+      - 'WatchIT.WebAPI.*'
+      - 'Dockerfile'
+      - '.github/workflows/*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+      - name: Add NuGet source
+        run: dotnet nuget add source https://nuget.pkg.github.com/WatchITProject/index.json --username ${{secrets.NUGET_SOURCE_USERNAME}} --password ${{secrets.NUGET_SOURCE_TOKEN}} --store-password-in-clear-text
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Test
+        run: dotnet test --no-build --verbosity normal
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build the Docker image
+        run: docker build -t ghcr.io/watchit/watchit-api:latest .
+      - name: Publish the Docker image
+        run: docker push ghcr.io/watchit/watchit-api:latest
+    
+      
