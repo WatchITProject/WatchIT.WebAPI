@@ -10,25 +10,7 @@ on:
       - '.github/workflows/*'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 8.0.x
-      - name: Add NuGet source
-        run: dotnet nuget add source https://nuget.pkg.github.com/WatchITProject/index.json --username ${{secrets.NUGET_SOURCE_USERNAME}} --password ${{secrets.NUGET_SOURCE_TOKEN}} --store-password-in-clear-text
-      - name: Restore dependencies
-        run: dotnet restore
-      - name: Build
-        run: dotnet build --no-restore
-      - name: Test
-        run: dotnet test --no-build --verbosity normal
-  publish:
-    needs: build
+  build-and-publish:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,6 +21,13 @@ jobs:
           registry: ghcr.io
           username: ${{ secrets.NUGET_SOURCE_USERNAME }}
           password: ${{ secrets.NUGET_SOURCE_TOKEN }}
+      - name: App Settings Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: 'WatchIT.WebAPI/Config/*.json'
+        env:
+          JWT.Key: ${{ secrets.API_KEY }}
+          ConnectionStrings.database: ${{ secrets.DEV_DB_CONNECTION_STRING }}
       - name: Build the Docker image
         run: docker build -t ghcr.io/watchitproject/watchit-api:latest --build-arg WATCHIT_API_NUGET_USERNAME=${{secrets.NUGET_SOURCE_USERNAME}} --build-arg WATCHIT_API_NUGET_PASSWORD=${{secrets.NUGET_SOURCE_TOKEN}} .
       - name: Publish the Docker image
