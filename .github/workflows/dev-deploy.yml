@@ -10,7 +10,7 @@ on:
       - '.github/workflows/*'
 
 jobs:
-  build-and-publish:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -27,6 +27,12 @@ jobs:
         run: dotnet build --no-restore
       - name: Test
         run: dotnet test --no-build --verbosity normal
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v1
         with:
@@ -35,6 +41,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build the Docker image
         run: docker build -t ghcr.io/watchit/watchit-api:latest $GITHUB_WORKSPACE/WatchIT.WebAPI
+        env:
+          WATCHIT_API_NUGET_USERNAME: ${{secrets.NUGET_SOURCE_USERNAME}}
+          WATCHIT_API_NUGET_PASSWORD: ${{secrets.NUGET_SOURCE_TOKEN}}
       - name: Publish the Docker image
         run: docker push ghcr.io/watchit/watchit-api:latest
     
