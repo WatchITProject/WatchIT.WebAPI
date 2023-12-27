@@ -40,8 +40,10 @@ jobs:
         run: docker login ghcr.io -u ${{secrets.NUGET_SOURCE_USERNAME}} -p ${{ secrets.NUGET_SOURCE_TOKEN }}
       - name: Stop Docker container
         run: docker container stop api
+        continue-on-error: true
       - name: Remove Docker container
         run: docker container rm api
+        continue-on-error: true
       - name: Run Docker container
         run: docker run --name api -p 10443:443 -p 1080:80 ghcr.io/watchitproject/watchit-api:latest
       
