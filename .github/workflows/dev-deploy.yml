@@ -39,12 +39,8 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Set up NuGet username variable
-        run: export WATCHIT_API_NUGET_USERNAME=${{secrets.NUGET_SOURCE_USERNAME}}
-      - name: Set up NuGet password variable
-        run: export WATCHIT_API_NUGET_PASSWORD=${{secrets.NUGET_SOURCE_TOKEN}}
       - name: Build the Docker image
-        run: docker build -t ghcr.io/watchit/watchit-api:latest .
+        run: docker build -t ghcr.io/watchit/watchit-api:latest --build-arg WATCHIT_API_NUGET_USERNAME=${{secrets.NUGET_SOURCE_USERNAME}} --build-arg WATCHIT_API_NUGET_PASSWORD=${{secrets.NUGET_SOURCE_TOKEN}}.
       - name: Publish the Docker image
         run: docker push ghcr.io/watchit/watchit-api:latest
     
