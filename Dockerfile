@@ -18,6 +18,7 @@ WORKDIR /src
 RUN dotnet publish "WatchIT.WebAPI.sln" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
+ENV COMPlus_EnableDiagnostics=0
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "WatchIT.WebAPI.dll"]
