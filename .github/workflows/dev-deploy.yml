@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: Login to GitHub Container Registry
         run: docker login ghcr.io -u ${{secrets.NUGET_SOURCE_USERNAME}} -p ${{ secrets.NUGET_SOURCE_TOKEN }}
+      - name: Pull Docker image
+        run: docker pull ghcr.io/watchitproject/watchit-api:latest
       - name: Stop Docker container
         run: docker container stop api
         continue-on-error: true
@@ -45,5 +47,5 @@ jobs:
         run: docker container rm api
         continue-on-error: true
       - name: Run Docker container
-        run: docker run --name api -p 10443:443 -p 1080:80 ghcr.io/watchitproject/watchit-api:latest
+        run: docker run --name api -p 10443:443 -p 1080:80 --rm ghcr.io/watchitproject/watchit-api:latest
       
