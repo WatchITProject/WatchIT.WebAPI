@@ -44,6 +44,4 @@ jobs:
       - name: Remove Docker container
         run: docker container rm api
         continue-on-error: true
-      - name: Run Docker container
-        run: docker run --name api -p 10443:443 -p 1080:80 ghcr.io/watchitproject/watchit-api:latest
       
