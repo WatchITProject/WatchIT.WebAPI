@@ -1,6 +1,6 @@
 {
   "JWT": {
-    "Key": "",
+    "Key": "testowyklucz",
     "Issuer": "WatchIT",
     "AccessTokenLifetime": "5",
     "RefreshTokenNormalLifetime": "1440",
