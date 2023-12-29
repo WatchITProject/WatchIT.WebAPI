@@ -13,6 +13,7 @@ COPY --from=build /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotne
 COPY --from=build /app/publish .
 ENV ASPNETCORE_ENVIRONMENT=Development
 ENV ASPNETCORE_URLS=https://+:443;http://+:80
+ENV ENABLE_CORS=true
 EXPOSE 80
 EXPOSE 443
 ENTRYPOINT ["dotnet", "WatchIT.WebAPI.dll"]
