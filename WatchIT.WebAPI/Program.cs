@@ -77,11 +77,6 @@ namespace WatchIT.WebAPI
             });
             builder.Services.AddAuthorization();
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy("Cors", builder => builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
-            });
-
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -114,11 +109,9 @@ namespace WatchIT.WebAPI
                 app.UseSwaggerUI();
             }
 
-            
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build());
 
             app.UseHttpsRedirection();
-
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build());
 
             app.UseAuthentication();
             app.UseAuthorization();
