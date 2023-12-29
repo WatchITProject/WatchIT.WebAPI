@@ -3,6 +3,7 @@ ARG WATCHIT_API_NUGET_USERNAME
 ARG WATCHIT_API_NUGET_PASSWORD
 WORKDIR /src
 COPY . /src
+ENV ENABLE_CORS=true
 RUN dotnet nuget add source https://nuget.pkg.github.com/WatchITProject/index.json --username $WATCHIT_API_NUGET_USERNAME --password $WATCHIT_API_NUGET_PASSWORD --store-password-in-clear-text
 RUN dotnet dev-certs https --trust
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false "WatchIT.WebAPI.sln"
