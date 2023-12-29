@@ -118,7 +118,7 @@ namespace WatchIT.WebAPI
 
             app.UseHttpsRedirection();
 
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+            app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build());
 
             app.UseAuthentication();
             app.UseAuthorization();
