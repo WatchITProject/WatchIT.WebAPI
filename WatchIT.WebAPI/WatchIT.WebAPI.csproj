@@ -7,6 +7,7 @@
     <UserSecretsId>ad8dbe11-c92c-4e7c-8267-0233eeb016a4</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 	<DockerfileFile>..\Dockerfile</DockerfileFile>
+    <DockerfileRunArguments>-e "ENABLE_CORS=true"</DockerfileRunArguments>
   </PropertyGroup>
 
   <ItemGroup>
