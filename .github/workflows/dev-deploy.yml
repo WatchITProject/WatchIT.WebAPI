@@ -5,9 +5,9 @@ on:
     branches:
       - "dev"
     paths:
-      - 'WatchIT.WebAPI.*'
+      - 'WatchIT.WebAPI.**'
       - 'Dockerfile'
-      - '.github/workflows/*'
+      - '.github/workflows/**'
 
 jobs:
   build-and-publish:
