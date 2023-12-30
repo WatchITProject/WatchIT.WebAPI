@@ -23,9 +23,7 @@ namespace WatchIT.WebAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Configuration files
-            builder.Configuration.AddJsonFile("Config/appsettings.json", false, false);
-            builder.Configuration.AddJsonFile("Config/connectionStrings.json", false, false);
-            builder.Configuration.AddJsonFile("Config/jwt.json", false, false);
+            builder.Configuration.AddJsonFile("appsettings.json", false, false);
 
             // Authentication
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();

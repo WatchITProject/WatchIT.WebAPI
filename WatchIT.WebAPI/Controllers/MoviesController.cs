@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using WatchIT.Common;
 using WatchIT.Common.Movies.Request;
+using WatchIT.Common.Movies.Response;
 using WatchIT.WebAPI.Attributes;
 using WatchIT.WebAPI.Services.Movies;
 
@@ -33,6 +34,19 @@ namespace WatchIT.WebAPI.Controllers
 
 
         #region METHODS
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<ApiResponse<MovieResponse>> GetMovie([FromRoute]int id)
+        {
+            return await _moviesService.GetMovie(id);
+        }
+
+        [HttpGet]
+        public async Task<ApiResponse<IEnumerable<MovieResponse>>> GetMovies()
+        {
+            return await _moviesService.GetMovies();
+        }
 
         [HttpPost]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

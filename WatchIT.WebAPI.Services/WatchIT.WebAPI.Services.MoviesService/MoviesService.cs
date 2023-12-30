@@ -1,5 +1,7 @@
 ﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,7 @@ using WatchIT.Common;
 using WatchIT.Common.Accounts.Request;
 using WatchIT.Common.Accounts.Response;
 using WatchIT.Common.Movies.Request;
+using WatchIT.Common.Movies.Response;
 using WatchIT.WebAPI.Database;
 using WatchIT.WebAPI.Services;
 
@@ -16,6 +19,8 @@ namespace WatchIT.WebAPI.Services.Movies
 {
     public interface IMoviesService
     {
+        Task<ApiResponse<MovieResponse>> GetMovie(int id);
+        Task<ApiResponse<IEnumerable<MovieResponse>>> GetMovies();
         Task<ApiResponse<int>> AddMovie(MoviePostPutRequest request);
         Task<ApiResponse> ModifyMovie(int id, MoviePostPutRequest request);
         Task<ApiResponse> DeleteMovie(int id);
@@ -47,6 +52,58 @@ namespace WatchIT.WebAPI.Services.Movies
 
 
         #region PUBLIC METHODS
+
+        public async Task<ApiResponse<MovieResponse>> GetMovie(int id)
+        {
+            MediaMovie? movie = await _database.MediaMovie.FirstOrDefaultAsync(x => x.Id == id);
+            if (movie is null)
+            {
+                return new ApiResponse<MovieResponse>
+                {
+                    Success = false,
+                    Message = $"Movie with id {id} was not found"
+                };
+            }
+
+            Media? media = await _database.Media.FirstOrDefaultAsync(x => x.Id == movie.MediaId);
+
+            return new ApiResponse<MovieResponse>
+            {
+                Success = true,
+                Data = new MovieResponse
+                {
+                    Id = movie.Id,
+                    Title = media.Title,
+                    OriginalTitle = media.OriginalTitle,
+                    Description = media.Description,
+                    ReleaseDate = media.ReleaseDate,
+                    Length = media.Length,
+                }
+            };
+        }
+
+        public async Task<ApiResponse<IEnumerable<MovieResponse>>> GetMovies()
+        {
+            List<MovieResponse> movies = new List<MovieResponse>();
+            foreach (MediaMovie movie in _database.MediaMovie)
+            {
+                Media media = await _database.Media.FirstOrDefaultAsync(x => x.Id == movie.MediaId);
+                movies.Add(new MovieResponse
+                {
+                    Id = movie.Id,
+                    Title = media.Title,
+                    OriginalTitle = media.OriginalTitle,
+                    Description = media.Description,
+                    ReleaseDate = media.ReleaseDate,
+                    Length = media.Length,
+                });
+            }
+            return new ApiResponse<IEnumerable<MovieResponse>>
+            {
+                Success = true,
+                Data = movies
+            };
+        }
 
         public async Task<ApiResponse<int>> AddMovie(MoviePostPutRequest request)
         {
