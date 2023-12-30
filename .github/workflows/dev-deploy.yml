@@ -24,7 +24,7 @@ jobs:
       - name: App Settings Variable Substitution
         uses: microsoft/variable-substitution@v1
         with:
-          files: 'WatchIT.WebAPI/Config/*.json'
+          files: 'WatchIT.WebAPI/appsettings.json'
         env:
           JWT.Key: ${{ secrets.API_KEY }}
           ConnectionStrings.database: ${{ secrets.DEV_DB_CONNECTION_STRING }}
