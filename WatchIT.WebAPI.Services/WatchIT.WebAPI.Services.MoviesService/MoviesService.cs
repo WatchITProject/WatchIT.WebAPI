@@ -84,10 +84,12 @@ namespace WatchIT.WebAPI.Services.Movies
 
         public async Task<ApiResponse<IEnumerable<MovieResponse>>> GetMovies()
         {
+            IEnumerable<Media> mediaDb = await _database.Media.Where(x => _database.MediaMovie.Select(y => y.MediaId).Contains(x.Id)).ToListAsync();
+
             List<MovieResponse> movies = new List<MovieResponse>();
-            foreach (MediaMovie movie in _database.MediaMovie)
+            await foreach (MediaMovie movie in _database.MediaMovie.AsAsyncEnumerable())
             {
-                Media media = await _database.Media.FirstOrDefaultAsync(x => x.Id == movie.MediaId);
+                Media media = mediaDb.FirstOrDefault(x => x.Id == movie.MediaId);
                 movies.Add(new MovieResponse
                 {
                     Id = movie.Id,
