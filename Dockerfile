@@ -6,7 +6,7 @@ ENV ENABLE_CORS=true
 ENV ASPNETCORE_Kestrel__Certificates__Default__Password=$WATCHIT_CERTIFICATE_PASSWORD
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/cert/WatchIT.WebAPI.pfx
 WORKDIR /cert
-RUN openssl req -passout pass:$WATCHIT_CERTIFICATE_PASSWORD -keyout /cert/WatchIT.WebAPI.key -out /cert/WatchIT.WebAPI.csr -sha512 -newkey rsa:2048 -subj "/C=XX/ST=Poland/L=Warsaw/O=WatchIT/OU=WatchIT/CN=192.168.55.65:10443"
+RUN openssl req -passout pass:$WATCHIT_CERTIFICATE_PASSWORD -keyout /cert/WatchIT.WebAPI.key -out /cert/WatchIT.WebAPI.csr -sha512 -newkey rsa:2048 -subj "/C=XX/ST=Poland/L=Warsaw/O=WatchIT/OU=WatchIT/CN=192.168.55.65"
 RUN openssl x509 -signkey /cert/WatchIT.WebAPI.key -in /cert/WatchIT.WebAPI.csr -passin pass:$WATCHIT_CERTIFICATE_PASSWORD -req -days 365 -out /cert/WatchIT.WebAPI.crt
 RUN openssl pkcs12 -export -inkey /cert/WatchIT.WebAPI.key -in /cert/WatchIT.WebAPI.crt -passin pass:$WATCHIT_CERTIFICATE_PASSWORD -passout pass:$WATCHIT_CERTIFICATE_PASSWORD -out /cert/WatchIT.WebAPI.pfx 
 WORKDIR /src
