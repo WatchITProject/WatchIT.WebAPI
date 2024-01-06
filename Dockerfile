@@ -13,6 +13,7 @@ RUN dotnet dev-certs https --trust
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false "WatchIT.WebAPI.sln"
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS run
+ARG WATCHIT_CERTIFICATE_PASSWORD
 WORKDIR /app
 COPY --from=build /root/.dotnet/corefx/cryptography/x509stores/my/* /root/.dotnet/corefx/cryptography/x509stores/my/
 COPY --from=build /app/publish .
