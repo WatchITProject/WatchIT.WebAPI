@@ -72,12 +72,8 @@ namespace WatchIT.WebAPI.Services.Movies
                 };
             }
 
-            Task<Media?> mediaTask = _database.Media.FirstOrDefaultAsync(x => x.Id == movie.MediaId);
-            Task<List<RatingMedia>> ratingTask = _database.RatingMedia.Where(x => x.Id == movie.MediaId).ToListAsync();
-            await Task.WhenAll(mediaTask, ratingTask);
-
-            Media media = mediaTask.Result;
-            List<RatingMedia> rating = ratingTask.Result;
+            Media media = await _database.Media.FirstOrDefaultAsync(x => x.Id == movie.MediaId);
+            List<RatingMedia> rating = await _database.RatingMedia.Where(x => x.Id == movie.MediaId).ToListAsync();
 
             return new ApiResponse<MovieResponse>
             {
