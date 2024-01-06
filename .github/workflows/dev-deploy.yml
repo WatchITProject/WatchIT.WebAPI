@@ -29,7 +29,7 @@ jobs:
           JWT.Key: ${{ secrets.API_KEY }}
           ConnectionStrings.database: ${{ secrets.DEV_DB_CONNECTION_STRING }}
       - name: Build the Docker image
-        run: docker build -t ghcr.io/watchitproject/watchit-api:latest --build-arg WATCHIT_API_NUGET_USERNAME=${{secrets.NUGET_SOURCE_USERNAME}} --build-arg WATCHIT_API_NUGET_PASSWORD=${{secrets.NUGET_SOURCE_TOKEN}} .
+        run: docker build -t ghcr.io/watchitproject/watchit-api:latest --build-arg WATCHIT_API_NUGET_USERNAME=${{secrets.NUGET_SOURCE_USERNAME}} --build-arg WATCHIT_API_NUGET_PASSWORD=${{secrets.NUGET_SOURCE_TOKEN}} --build-arg WATCHIT_CERTIFICATE_PASSWORD=${{secrets.API_CERTIFICATE_PASSWORD}} .
       - name: Publish the Docker image
         run: docker push ghcr.io/watchitproject/watchit-api:latest
   deploy:
@@ -50,5 +50,5 @@ jobs:
       - name: Pull Docker image
         run: docker pull ghcr.io/watchitproject/watchit-api:latest
       - name: Run Docker container
-        run: docker run --name api -p 10443:443 -p 1080:80 --rm -d ghcr.io/watchitproject/watchit-api:latest
+        run: docker run --name api -p 10443:443 -p 1080:80 --restart unless-stopped -d ghcr.io/watchitproject/watchit-api:latest
       
