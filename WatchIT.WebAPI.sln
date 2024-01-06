@@ -29,6 +29,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Database", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatchIT.WebAPI.Services.Website", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.Website\WatchIT.WebAPI.Services.Website.csproj", "{418A3268-4C99-4F44-8AEF-BC73961E2CF1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WatchIT.WebAPI.Services.Persons", "WatchIT.WebAPI.Services\WatchIT.WebAPI.Services.Persons\WatchIT.WebAPI.Services.Persons.csproj", "{EE028782-27EB-4B72-B547-F5F7ACF8245A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{418A3268-4C99-4F44-8AEF-BC73961E2CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{418A3268-4C99-4F44-8AEF-BC73961E2CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{418A3268-4C99-4F44-8AEF-BC73961E2CF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EE028782-27EB-4B72-B547-F5F7ACF8245A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE028782-27EB-4B72-B547-F5F7ACF8245A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE028782-27EB-4B72-B547-F5F7ACF8245A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE028782-27EB-4B72-B547-F5F7ACF8245A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +87,7 @@ Global
 		{5CF25D20-B0BD-4A4E-AFE7-22A9DCD3E3D3} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
 		{D09AD624-835A-4DBA-809E-523427E16E7E} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
 		{418A3268-4C99-4F44-8AEF-BC73961E2CF1} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
+		{EE028782-27EB-4B72-B547-F5F7ACF8245A} = {2A7E34D2-4B3E-4662-8150-4364BD2151EB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4388A19D-2561-4DD0-AB26-793C5988BC3A}

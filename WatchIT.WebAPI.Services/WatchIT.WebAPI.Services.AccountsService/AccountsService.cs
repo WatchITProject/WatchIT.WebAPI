@@ -237,10 +237,6 @@ namespace WatchIT.WebAPI.Services.Accounts
 
         public async Task<ApiResponse<AuthenticateResponse>> AuthenticateRefresh(IEnumerable<Claim> claims)
         {
-            foreach (Claim claim in claims)
-            {
-                Debug.WriteLine($"{claim.Type}, {claim.Value}");
-            }
             Check<IEnumerable<Claim>>[] checks = new Check<IEnumerable<Claim>>[]
             {
                 new Check<IEnumerable<Claim>>

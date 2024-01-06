@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="WatchIT.Common" Version="0.1.0-alpha.33" />
+    <PackageReference Include="WatchIT.Common" Version="0.1.0-alpha.40" />
   </ItemGroup>
 
   <ItemGroup>

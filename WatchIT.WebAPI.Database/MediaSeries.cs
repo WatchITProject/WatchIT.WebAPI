@@ -9,7 +9,7 @@ public partial class MediaSeries
 
     public long MediaId { get; set; }
 
-    public DateTime? EndDate { get; set; }
+    public DateOnly? EndDate { get; set; }
 
     public virtual Media Media { get; set; } = null!;
 

@@ -1,10 +1,14 @@
 ﻿using Azure.Core;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using WatchIT.Common;
@@ -26,6 +30,9 @@ namespace WatchIT.WebAPI.Services.Movies
         Task<ApiResponse> DeleteMovie(int id);
         Task<ApiResponse> AddGenre(int movieId, int genreId);
         Task<ApiResponse> DeleteGenre(int movieId, int genreId);
+        Task<ApiResponse<byte?>> GetRating(int movieId, IEnumerable<Claim> userData);
+        Task<ApiResponse<IDictionary<byte, int>>> GetRatingSummary(int movieId);
+        Task<ApiResponse> AddRating(int movieId, IEnumerable<Claim> userData, byte rating);
     }
 
 
@@ -65,7 +72,12 @@ namespace WatchIT.WebAPI.Services.Movies
                 };
             }
 
-            Media? media = await _database.Media.FirstOrDefaultAsync(x => x.Id == movie.MediaId);
+            Task<Media?> mediaTask = _database.Media.FirstOrDefaultAsync(x => x.Id == movie.MediaId);
+            Task<List<RatingMedia>> ratingTask = _database.RatingMedia.Where(x => x.Id == movie.MediaId).ToListAsync();
+            await Task.WhenAll(mediaTask, ratingTask);
+
+            Media media = mediaTask.Result;
+            List<RatingMedia> rating = ratingTask.Result;
 
             return new ApiResponse<MovieResponse>
             {
@@ -78,18 +90,25 @@ namespace WatchIT.WebAPI.Services.Movies
                     Description = media.Description,
                     ReleaseDate = media.ReleaseDate,
                     Length = media.Length,
+                    AverageRating = rating.Any() ? rating.Average(x => x.Rating) : null,
+                    RatingCount = rating.Count,
+                    PosterImage = media.PosterImage,
+                    PosterImageContentType = media.PosterImageContentType,
                 }
             };
         }
 
         public async Task<ApiResponse<IEnumerable<MovieResponse>>> GetMovies()
         {
-            IEnumerable<Media> mediaDb = await _database.Media.Where(x => _database.MediaMovie.Select(y => y.MediaId).Contains(x.Id)).ToListAsync();
+            List<Media> mediaDb = await _database.Media.Where(x => _database.MediaMovie.Select(y => y.MediaId).Contains(x.Id)).ToListAsync();
+            List<RatingMedia> ratingDb = await _database.RatingMedia.Where(x => _database.MediaMovie.Select(y => y.MediaId).Contains(x.MediaId)).ToListAsync();
 
             List<MovieResponse> movies = new List<MovieResponse>();
             await foreach (MediaMovie movie in _database.MediaMovie.AsAsyncEnumerable())
             {
                 Media media = mediaDb.FirstOrDefault(x => x.Id == movie.MediaId);
+                IEnumerable<RatingMedia> rating = ratingDb.Where(x => x.MediaId == movie.MediaId);
+
                 movies.Add(new MovieResponse
                 {
                     Id = movie.Id,
@@ -98,6 +117,10 @@ namespace WatchIT.WebAPI.Services.Movies
                     Description = media.Description,
                     ReleaseDate = media.ReleaseDate,
                     Length = media.Length,
+                    AverageRating = rating.Any() ? rating.Average(x => x.Rating) : null,
+                    RatingCount = rating.Count(),
+                    PosterImage = media.PosterImage,
+                    PosterImageContentType = media.PosterImageContentType,
                 });
             }
             return new ApiResponse<IEnumerable<MovieResponse>>
@@ -125,7 +148,9 @@ namespace WatchIT.WebAPI.Services.Movies
                 OriginalTitle = request.OriginalTitle,
                 Description = request.Description,
                 Length = request.Length,
-                ReleaseDate = request.ReleaseDate.ToDateTime(new TimeOnly(0))
+                ReleaseDate = request.ReleaseDate,
+                PosterImage = request.PosterImage,
+                PosterImageContentType = request.PosterImageContentType,
             };
             await _database.Media.AddAsync(media);
             await _database.SaveChangesAsync();
@@ -182,7 +207,9 @@ namespace WatchIT.WebAPI.Services.Movies
             media.OriginalTitle = request.OriginalTitle;
             media.Description = request.Description;
             media.Length = request.Length;
-            media.ReleaseDate = request.ReleaseDate.ToDateTime(new TimeOnly(0));
+            media.ReleaseDate = request.ReleaseDate;
+            media.PosterImage = request.PosterImage;
+            media.PosterImageContentType = request.PosterImageContentType;
 
             await _database.SaveChangesAsync();
 
@@ -217,9 +244,13 @@ namespace WatchIT.WebAPI.Services.Movies
             }
 
             IEnumerable<GenreMedia> genreMedia = _database.GenreMedia.Where(x => x.MediaId == media.Id);
+            IEnumerable<RatingMedia> ratingMedia = _database.RatingMedia.Where(x => x.MediaId == media.Id);
 
             _database.GenreMedia.AttachRange(genreMedia);
             _database.GenreMedia.RemoveRange(genreMedia);
+
+            _database.RatingMedia.AttachRange(ratingMedia);
+            _database.RatingMedia.RemoveRange(ratingMedia);
 
             await _database.SaveChangesAsync();
 
@@ -335,6 +366,159 @@ namespace WatchIT.WebAPI.Services.Movies
             return new ApiResponse
             {
                 Success = true
+            };
+        }
+
+        public async Task<ApiResponse<byte?>> GetRating(int movieId, IEnumerable<Claim> userData)
+        {
+            MediaMovie? movie = await _database.MediaMovie.FirstOrDefaultAsync(x => x.Id == movieId);
+            if (movie is null)
+            {
+                return new ApiResponse<byte?>
+                {
+                    Success = false,
+                    Message = $"Movie with id {movieId} was not found"
+                };
+            }
+
+            int userId = int.Parse(userData.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
+
+            RatingMedia? rating = await _database.RatingMedia.FirstOrDefaultAsync(x => x.MediaId == movie.MediaId && x.AccountId == userId);
+
+            return new ApiResponse<byte?>
+            {
+                Success = true,
+                Message = rating is null ? "Movie was not rated by you" : null,
+                Data = rating?.Rating
+            };
+        }
+
+        public async Task<ApiResponse<IDictionary<byte, int>>> GetRatingSummary(int movieId)
+        {
+            MediaMovie? movie = await _database.MediaMovie.FirstOrDefaultAsync(x => x.Id == movieId);
+            if (movie is null)
+            {
+                return new ApiResponse<IDictionary<byte, int>>
+                {
+                    Success = false,
+                    Message = $"Movie with id {movieId} was not found"
+                };
+            }
+
+            return new ApiResponse<IDictionary<byte, int>>
+            {
+                Success = true,
+                Data = await _database.RatingMedia.GroupBy(x => x.Rating).ToDictionaryAsync(x => x.Key, x => x.Count()),
+            };
+        }
+
+        public async Task<ApiResponse> AddRating(int movieId, IEnumerable<Claim> userData, byte rating)
+        {
+            MediaMovie? movie = await _database.MediaMovie.FirstOrDefaultAsync(x => x.Id == movieId);
+            if (movie is null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = $"Movie with id {movieId} was not found"
+                };
+            }
+
+            int userId = int.Parse(userData.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
+
+            RatingMedia? ratingDb = await _database.RatingMedia.FirstOrDefaultAsync(x => x.MediaId == movie.MediaId && x.AccountId == userId);
+
+            if (ratingDb is not null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = $"Movie with id {movieId} was already rated by you"
+                };
+            }
+
+            ratingDb = new RatingMedia
+            {
+                MediaId = movie.MediaId,
+                AccountId = userId,
+                Rating = rating
+            };
+            await _database.RatingMedia.AddAsync(ratingDb);
+            await _database.SaveChangesAsync();
+
+            return new ApiResponse
+            { 
+                Success = true 
+            };
+        }
+
+        public async Task<ApiResponse> ModifyRating(int movieId, IEnumerable<Claim> userData, byte rating)
+        {
+            MediaMovie? movie = await _database.MediaMovie.FirstOrDefaultAsync(x => x.Id == movieId);
+            if (movie is null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = $"Movie with id {movieId} was not found"
+                };
+            }
+
+            int userId = int.Parse(userData.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
+
+            RatingMedia? ratingDb = await _database.RatingMedia.FirstOrDefaultAsync(x => x.MediaId == movie.MediaId && x.AccountId == userId);
+
+            if (ratingDb is null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = $"Movie with id {movieId} was not rated by you"
+                };
+            }
+
+            ratingDb.Rating = rating;
+
+            await _database.SaveChangesAsync();
+
+            return new ApiResponse
+            {
+                Success = true,
+            };
+        }
+
+        public async Task<ApiResponse> DeleteRating(int movieId, IEnumerable<Claim> userData)
+        {
+            MediaMovie? movie = await _database.MediaMovie.FirstOrDefaultAsync(x => x.Id == movieId);
+            if (movie is null)
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Message = $"Movie with id {movieId} was not found"
+                };
+            }
+
+            int userId = int.Parse(userData.FirstOrDefault(x => x.Type == JwtRegisteredClaimNames.Sub)!.Value);
+
+            RatingMedia? ratingDb = await _database.RatingMedia.FirstOrDefaultAsync(x => x.MediaId == movie.MediaId && x.AccountId == userId);
+
+            if (ratingDb is null)
+            {
+                return new ApiResponse
+                {
+                    Success = true,
+                    Message = $"Movie with id {movieId} was not rated by you"
+                };
+            }
+
+            _database.RatingMedia.Attach(ratingDb);
+            _database.RatingMedia.Remove(ratingDb);
+            await _database.SaveChangesAsync();
+
+            return new ApiResponse
+            {
+                Success = true,
             };
         }
 

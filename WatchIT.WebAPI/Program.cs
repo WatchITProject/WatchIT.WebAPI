@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using WatchIT.WebAPI.Database;
 using WatchIT.WebAPI.Services.Accounts;
@@ -108,8 +111,6 @@ namespace WatchIT.WebAPI
             }
 
             app.UseCors(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build());
-
-            app.UseHttpsRedirection();
 
             app.UseAuthentication();
             app.UseAuthorization();

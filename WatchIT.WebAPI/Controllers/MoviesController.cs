@@ -92,6 +92,45 @@ namespace WatchIT.WebAPI.Controllers
             return await _moviesService.DeleteGenre(movieId, genreId);
         }
 
+        [HttpGet]
+        [Route("{movie_id}/rating")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ApiResponse<byte?>> GetRating([FromRoute(Name = "movie_id")] int movieId)
+        {
+            return await _moviesService.GetRating(movieId, User.Claims);
+        }
+
+        [HttpGet]
+        [Route("{movie_id}/rating/summary")]
+        public async Task<ApiResponse<IDictionary<byte, int>>> GetRatingSummary([FromRoute(Name = "movie_id")] int movieId)
+        {
+            return await _moviesService.GetRatingSummary(movieId);
+        }
+
+        [HttpPost]
+        [Route("{movie_id}/rating")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ApiResponse> AddRating([FromRoute(Name = "movie_id")] int movieId, [FromBody][BindRequired] byte rating)
+        {
+            return await _moviesService.AddRating(movieId, User.Claims, rating);
+        }
+
+        [HttpPut]
+        [Route("{movie_id}/rating")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ApiResponse> ModifyRating([FromRoute(Name = "movie_id")] int movieId, [FromBody][BindRequired] byte rating)
+        {
+            return null;
+        }
+
+        [HttpDelete]
+        [Route("{movie_id}/rating")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<ApiResponse> DeleteRating([FromRoute(Name = "movie_id")] int movieId)
+        {
+            return null;
+        }
+
         #endregion
     }
 }

@@ -155,7 +155,9 @@ public partial class DatabaseContext : DbContext
             entity.Property(e => e.OriginalTitle)
                 .HasMaxLength(400)
                 .IsUnicode(false);
-            entity.Property(e => e.ReleaseDate).HasColumnType("date");
+            entity.Property(e => e.PosterImageContentType)
+                .HasMaxLength(100)
+                .IsUnicode(false);
             entity.Property(e => e.Title)
                 .HasMaxLength(400)
                 .IsUnicode(false);
@@ -174,8 +176,6 @@ public partial class DatabaseContext : DbContext
         modelBuilder.Entity<MediaSeries>(entity =>
         {
             entity.HasIndex(e => e.MediaId, "UQ__MediaSer__B2C2B5CE267E98C0").IsUnique();
-
-            entity.Property(e => e.EndDate).HasColumnType("date");
 
             entity.HasOne(d => d.Media).WithOne(p => p.MediaSeries)
                 .HasForeignKey<MediaSeries>(d => d.MediaId)
@@ -209,7 +209,6 @@ public partial class DatabaseContext : DbContext
 
         modelBuilder.Entity<Person>(entity =>
         {
-            entity.Property(e => e.Birthday).HasColumnType("date");
             entity.Property(e => e.Description).IsUnicode(false);
             entity.Property(e => e.FullName)
                 .HasMaxLength(200)

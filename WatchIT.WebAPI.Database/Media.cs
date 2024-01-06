@@ -13,9 +13,13 @@ public partial class Media
 
     public string? Description { get; set; }
 
-    public DateTime? ReleaseDate { get; set; }
+    public DateOnly? ReleaseDate { get; set; }
 
     public short? Length { get; set; }
+
+    public byte[]? PosterImage { get; set; }
+
+    public string? PosterImageContentType { get; set; }
 
     public virtual ICollection<GenreMedia> GenreMedia { get; set; } = new List<GenreMedia>();
 
