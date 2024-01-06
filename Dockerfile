@@ -6,7 +6,7 @@ WORKDIR /src
 COPY . /src
 ENV ENABLE_CORS=true
 ENV ASPNETCORE_Kestrel__Certificates__Default__Password=$WATCHIT_CERTIFICATE_PASSWORD
-ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/cert/aspnetapp.pfx
+ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/cert/watchit.pfx
 RUN dotnet nuget add source https://nuget.pkg.github.com/WatchITProject/index.json --username $WATCHIT_API_NUGET_USERNAME --password $WATCHIT_API_NUGET_PASSWORD --store-password-in-clear-text
 RUN dotnet dev-certs https -ep /cert/watchit.pfx -p $WATCHIT_CERTIFICATE_PASSWORD
 RUN dotnet dev-certs https --trust
