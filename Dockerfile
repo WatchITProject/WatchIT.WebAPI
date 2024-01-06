@@ -12,7 +12,6 @@ RUN openssl pkcs12 -export -inkey /cert/WatchIT.WebAPI.key -in /cert/WatchIT.Web
 WORKDIR /src
 COPY . /src
 RUN dotnet nuget add source https://nuget.pkg.github.com/WatchITProject/index.json --username $WATCHIT_API_NUGET_USERNAME --password $WATCHIT_API_NUGET_PASSWORD --store-password-in-clear-text
-RUN dotnet dev-certs https -ep /cert/WatchIT.WebAPI.pfx -p $WATCHIT_CERTIFICATE_PASSWORD
 RUN dotnet dev-certs https --trust
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false "WatchIT.WebAPI.sln"
 
